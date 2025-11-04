@@ -2,18 +2,20 @@
 FastAPI Backend for Hotel Reservations Data Viewer
 """
 
+import logging
+from datetime import datetime
+from typing import Optional, List
+
+import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text, func
+from sqlalchemy import text
 from sqlalchemy.orm import Session
-from typing import Optional, List
-from datetime import datetime
-import logging
 
 from database import get_db, test_connection, get_available_tables, get_table_info, DB_SCHEMA
 from models import (
-    FilterParams, PaginationParams, SortParams, DatasetInfo, 
-    DataResponse, StatsResponse, HealthResponse, ErrorResponse
+    FilterParams, DatasetInfo,
+    DataResponse, StatsResponse, HealthResponse
 )
 
 # Configure logging
@@ -337,7 +339,6 @@ async def get_statistics(
 
 
 if __name__ == "__main__":
-    import uvicorn
     print("Starting Hotel Reservations API...")
     print("Docs available at: http://localhost:8000/docs")
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

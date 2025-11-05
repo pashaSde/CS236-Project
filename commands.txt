@@ -10,7 +10,14 @@ postgres:latest
 
 run script: spark-submit --packages org.postgresql:postgresql:42.7.3 databaseLoader.py
 
+Export sql : docker exec postgres pg_dump -U admin -d innsight --schema-only > phase2_ddl.sql
+
 ---
+
+
+
+
+
 
 
 Pyspark error fix:

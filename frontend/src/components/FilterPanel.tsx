@@ -179,6 +179,69 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
                 ))}
               </select>
             </div>
+
+            {/* Market Segment */}
+            <div className="filter-group">
+              <label>Market Segment</label>
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Online') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Online')}
+                  />
+                  Online
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Offline') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Offline')}
+                  />
+                  Offline
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Online TA') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Online TA')}
+                  />
+                  Online TA (Travel Agents)
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Online TO') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Online TO')}
+                  />
+                  Online TO (Tour Operators)
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Corporate') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Corporate')}
+                  />
+                  Corporate
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Aviation') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Aviation')}
+                  />
+                  Aviation
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={localFilters.market_segment?.includes('Complementary') || false}
+                    onChange={() => handleCheckboxChange('market_segment', 'Complementary')}
+                  />
+                  Complementary
+                </label>
+              </div>
+            </div>
           </div>
 
           <div className="filter-actions">

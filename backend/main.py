@@ -72,10 +72,19 @@ def build_filter_query(base_query: str, filters: FilterParams) -> tuple:
         where_clauses.append("avg_price_per_room <= :max_price")
         params["max_price"] = filters.max_price
     
-    # Booking status filter
+    # Booking status filter - handle both string and boolean
     if filters.booking_status:
-        where_clauses.append("is_canceled = ANY(:booking_status)")
-        params["booking_status"] = filters.booking_status
+        # Convert string values to boolean for database query
+        bool_values = []
+        for status in filters.booking_status:
+            if status in ('Canceled', 'true', 'True', '1'):
+                bool_values.append(True)
+            elif status in ('Not_Canceled', 'false', 'False', '0'):
+                bool_values.append(False)
+        
+        if bool_values:
+            where_clauses.append("is_canceled = ANY(:booking_status)")
+            params["booking_status"] = bool_values
     
     # Date filters
     if filters.arrival_year is not None:

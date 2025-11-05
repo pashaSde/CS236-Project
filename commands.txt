@@ -4,7 +4,7 @@ docker run -d \
 --name postgres \   
 -e POSTGRES_USER=admin \
 -e POSTGRES_PASSWORD=secret123 \
--e POSTGRES_DB=InnSight \    
+-e POSTGRES_DB=innsight \
 -p 5432:5432 \
 postgres:latest
 

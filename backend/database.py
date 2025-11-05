@@ -12,8 +12,8 @@ DB_USER = os.getenv("DB_USER", "admin")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "secret123")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "reservations")
-DB_SCHEMA = os.getenv("DB_SCHEMA", "innsight")
+DB_NAME = os.getenv("DB_NAME", "innsight")
+DB_SCHEMA = os.getenv("DB_SCHEMA", "public")
 
 # Database URL
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -68,7 +68,7 @@ def get_available_tables():
             result = conn.execute(text(f"""
                 SELECT table_name 
                 FROM information_schema.tables 
-                WHERE table_schema = '{DB_SCHEMA}'
+                WHERE table_schema = 'public'
                 AND table_type = 'BASE TABLE'
                 ORDER BY table_name
             """))
@@ -91,7 +91,7 @@ def get_table_info(table_name: str):
                     data_type,
                     is_nullable
                 FROM information_schema.columns 
-                WHERE table_schema = '{DB_SCHEMA}'
+                WHERE table_schema = 'public'
                 AND table_name = '{table_name}'
                 ORDER BY ordinal_position
             """))

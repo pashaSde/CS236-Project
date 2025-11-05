@@ -267,7 +267,7 @@ Creates performance indexes and updates table statistics for query optimization.
 ### 3.3 Execution
 
 ```bash
-export POSTGRES_PWD=secret123
+export POSTGRES_PWD=********
 spark-submit --packages org.postgresql:postgresql:42.7.3 databaseLoader.py
 ```
 

@@ -32,7 +32,7 @@ app = FastAPI(
 # CORS middleware - allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React dev servers
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:3001"],  # React dev servers
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -307,8 +307,8 @@ async def get_statistics(
                 AVG(lead_time) as avg_lead_time,
                 AVG(stays_in_weekend_nights) as avg_weekend_nights,
                 AVG(stays_in_week_nights) as avg_week_nights,
-                COUNT(CASE WHEN is_canceled IN ('true', 'Canceled') THEN 1 END) as canceled_count,
-                COUNT(CASE WHEN is_canceled IN ('false', 'Not_Canceled') THEN 1 END) as not_canceled_count
+                COUNT(CASE WHEN is_canceled IS TRUE OR lower(is_canceled::text) IN ('true', 'Canceled') THEN 1 END) as canceled_count,
+                COUNT(CASE WHEN is_canceled IS FALSE OR lower(is_canceled::text) IN ('false', 'Not_Canceled') THEN 1 END) as not_canceled_count
             FROM {DB_SCHEMA}.{dataset}
         """)
         

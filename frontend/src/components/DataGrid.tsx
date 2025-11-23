@@ -111,7 +111,7 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
     <div className="data-grid-container">
       <div className="data-grid-header">
         <div className="data-info">
-          <h3>📊 {dataset.display_name}</h3>
+          <h3>{dataset.display_name}</h3>
           <p>
             Showing {rowData.length} of {totalRecords.toLocaleString()} records
             {Object.keys(filters).length > 0 && ' (filtered)'}

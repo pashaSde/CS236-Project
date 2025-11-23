@@ -108,21 +108,21 @@ function App() {
 
       {stats && <StatsPanel stats={stats} />}
 
-      <FilterPanel 
+      <FilterPanel
         dataset={selectedDataset}
         filters={filters}
         onFilterChange={handleFilterChange}
       />
 
       {selectedDataset && (
-        <DataGrid 
+        <DataGrid
           dataset={selectedDataset}
           filters={filters}
         />
       )}
 
       <footer className="app-footer">
-        <p>CS236 Project - Hotel Reservations Analysis | Built with React + TypeScript + AG Grid + FastAPI</p>
+        <p>CS236 Project - Hotel Reservations Analysis</p>
       </footer>
     </div>
   )

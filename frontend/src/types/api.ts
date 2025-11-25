@@ -77,6 +77,8 @@ export interface FilterParams {
   booking_status?: string[]
   arrival_year?: number
   arrival_month?: number
+  arrival_date_from?: string
+  arrival_date_to?: string
   market_segment?: string[]
   hotel?: string[]
   country?: string[]
@@ -94,6 +96,8 @@ export interface Filters {
   booking_status?: string[]
   arrival_year?: string
   arrival_month?: string
+  arrival_date_from?: string
+  arrival_date_to?: string
   market_segment?: string[]
   hotel?: string[]
   country?: string[]

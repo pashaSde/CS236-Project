@@ -21,6 +21,8 @@ class FilterParams(BaseModel):
     # Date filters
     arrival_year: Optional[int] = Field(None, description="Arrival year")
     arrival_month: Optional[int] = Field(None, ge=1, le=12, description="Arrival month (1-12)")
+    arrival_date_from: Optional[str] = Field(None, description="Arrival date from (YYYY-MM format)")
+    arrival_date_to: Optional[str] = Field(None, description="Arrival date to (YYYY-MM format)")
     
     # Stay filters
     min_weekend_nights: Optional[int] = Field(None, ge=0, description="Minimum weekend nights")

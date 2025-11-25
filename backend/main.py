@@ -83,17 +83,54 @@ def build_filter_query(base_query: str, filters: FilterParams) -> tuple:
                 bool_values.append(False)
         
         if bool_values:
-            where_clauses.append("is_canceled = ANY(:booking_status)")
-            params["booking_status"] = bool_values
+            # Remove duplicates while preserving order
+            unique_bool_values = list(dict.fromkeys(bool_values))
+            
+            # Handle boolean filter - PostgreSQL boolean comparison
+            # Use explicit boolean casting to ensure proper type handling
+            if len(unique_bool_values) == 1:
+                # Single value: use direct comparison with explicit boolean cast
+                bool_val = unique_bool_values[0]
+                # Use PostgreSQL boolean literal syntax
+                bool_literal = 'TRUE' if bool_val else 'FALSE'
+                where_clauses.append(f"is_canceled = {bool_literal}")
+            else:
+                # Multiple values: use OR conditions with boolean literals
+                or_conditions = []
+                for val in unique_bool_values:
+                    bool_literal = 'TRUE' if val else 'FALSE'
+                    or_conditions.append(f"is_canceled = {bool_literal}")
+                where_clauses.append(f"({' OR '.join(or_conditions)})")
     
-    # Date filters
-    if filters.arrival_year is not None:
-        where_clauses.append("arrival_year = :arrival_year")
-        params["arrival_year"] = filters.arrival_year
-    
-    if filters.arrival_month is not None:
-        where_clauses.append("arrival_month = :arrival_month")
-        params["arrival_month"] = filters.arrival_month
+    # Date filters - handle date range first, then individual year/month
+    if filters.arrival_date_from or filters.arrival_date_to:
+        date_conditions = []
+        
+        if filters.arrival_date_from:
+            from_year, from_month = map(int, filters.arrival_date_from.split('-'))
+            # (year > from_year) OR (year = from_year AND month >= from_month)
+            date_conditions.append(f"((arrival_year > :from_year) OR (arrival_year = :from_year AND arrival_month >= :from_month))")
+            params["from_year"] = from_year
+            params["from_month"] = from_month
+        
+        if filters.arrival_date_to:
+            to_year, to_month = map(int, filters.arrival_date_to.split('-'))
+            # (year < to_year) OR (year = to_year AND month <= to_month)
+            date_conditions.append(f"((arrival_year < :to_year) OR (arrival_year = :to_year AND arrival_month <= :to_month))")
+            params["to_year"] = to_year
+            params["to_month"] = to_month
+        
+        if date_conditions:
+            where_clauses.append(f"({' AND '.join(date_conditions)})")
+    else:
+        # Legacy individual year/month filters (only if date range not used)
+        if filters.arrival_year is not None:
+            where_clauses.append("arrival_year = :arrival_year")
+            params["arrival_year"] = filters.arrival_year
+        
+        if filters.arrival_month is not None:
+            where_clauses.append("arrival_month = :arrival_month")
+            params["arrival_month"] = filters.arrival_month
     
     # Stay filters
     if filters.min_weekend_nights is not None:
@@ -213,6 +250,8 @@ async def get_data(
     booking_status: Optional[List[str]] = Query(None, description="Booking status"),
     arrival_year: Optional[int] = Query(None, description="Arrival year"),
     arrival_month: Optional[int] = Query(None, ge=1, le=12, description="Arrival month"),
+    arrival_date_from: Optional[str] = Query(None, description="Arrival date from (YYYY-MM)"),
+    arrival_date_to: Optional[str] = Query(None, description="Arrival date to (YYYY-MM)"),
     market_segment: Optional[List[str]] = Query(None, description="Market segment"),
     hotel: Optional[List[str]] = Query(None, description="Hotel"),
     country: Optional[List[str]] = Query(None, description="Country"),
@@ -231,6 +270,8 @@ async def get_data(
             booking_status=booking_status,
             arrival_year=arrival_year,
             arrival_month=arrival_month,
+            arrival_date_from=arrival_date_from,
+            arrival_date_to=arrival_date_to,
             market_segment=market_segment,
             hotel=hotel,
             country=country

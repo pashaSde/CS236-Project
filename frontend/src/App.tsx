@@ -85,7 +85,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🏨 Hotel Reservations Data Viewer</h1>
+        <h1>Hotel Reservations Data Viewer</h1>
         <p>Interactive data exploration with filtering and analysis</p>
       </header>
 

@@ -11,6 +11,9 @@ const api: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  paramsSerializer: {
+    indexes: null, // Send arrays as repeated query params: booking_status=Canceled&booking_status=Not_Canceled
+  },
 })
 
 // Request interceptor for debugging

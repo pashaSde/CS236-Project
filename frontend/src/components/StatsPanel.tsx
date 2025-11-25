@@ -12,12 +12,11 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
 
   return (
     <div className="stats-panel">
-      <h3>📈 Dataset Statistics</h3>
+      <h3>Dataset Statistics</h3>
       
       <div className="stats-grid">
         {/* Total Records */}
         <div className="stat-card">
-          <div className="stat-icon">📊</div>
           <div className="stat-content">
             <div className="stat-label">Total Records</div>
             <div className="stat-value">{stats.total_records.toLocaleString()}</div>
@@ -26,7 +25,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
 
         {/* Average Price */}
         <div className="stat-card">
-          <div className="stat-icon">💰</div>
           <div className="stat-content">
             <div className="stat-label">Average Price</div>
             <div className="stat-value">
@@ -41,7 +39,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
 
         {/* Cancellation Rate */}
         <div className="stat-card">
-          <div className="stat-icon">📉</div>
           <div className="stat-content">
             <div className="stat-label">Cancellation Rate</div>
             <div className="stat-value">
@@ -56,7 +53,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
 
         {/* Average Lead Time */}
         <div className="stat-card">
-          <div className="stat-icon">📅</div>
           <div className="stat-content">
             <div className="stat-label">Avg Lead Time</div>
             <div className="stat-value">
@@ -68,7 +64,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
         {/* Unique Hotels */}
         {(statistics.unique_hotels || 0) > 0 && (
           <div className="stat-card">
-            <div className="stat-icon">🏨</div>
             <div className="stat-content">
               <div className="stat-label">Hotels</div>
               <div className="stat-value">{statistics.unique_hotels}</div>
@@ -79,7 +74,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
         {/* Unique Countries */}
         {(statistics.unique_countries || 0) > 0 && (
           <div className="stat-card">
-            <div className="stat-icon">🌍</div>
             <div className="stat-content">
               <div className="stat-label">Countries</div>
               <div className="stat-value">{statistics.unique_countries}</div>
@@ -89,7 +83,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
 
         {/* Average Stay */}
         <div className="stat-card">
-          <div className="stat-icon">🛏️</div>
           <div className="stat-content">
             <div className="stat-label">Avg Stay</div>
             <div className="stat-value">
@@ -108,7 +101,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
         {/* Market Segments */}
         {(statistics.unique_market_segments || 0) > 0 && (
           <div className="stat-card">
-            <div className="stat-icon">🎯</div>
             <div className="stat-content">
               <div className="stat-label">Market Segments</div>
               <div className="stat-value">{statistics.unique_market_segments}</div>

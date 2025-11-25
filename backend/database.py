@@ -8,11 +8,11 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 
 # Database configuration
-DB_USER = os.getenv("DB_USER", "admin")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "secret123")
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "rootpassword")
+DB_HOST = os.getenv("DB_HOST", "database-1.cgd0sswa4bi6.us-east-1.rds.amazonaws.com")
 DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "innsight")
+DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_SCHEMA = os.getenv("DB_SCHEMA", "public")
 
 # Database URL
@@ -52,10 +52,10 @@ def test_connection():
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT 1"))
-            print("✓ Database connection successful")
+            print("Database connection successful")
             return True
     except Exception as e:
-        print(f"✗ Database connection failed: {str(e)}")
+        print(f"Database connection failed: {str(e)}")
         return False
 
 

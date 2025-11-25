@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import type { Dataset, Filters } from '../types/api'
 import './FilterPanel.css'
 
@@ -16,6 +18,8 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
     booking_status: [],
     arrival_year: '',
     arrival_month: '',
+    arrival_date_from: '',
+    arrival_date_to: '',
     market_segment: [],
     hotel: [],
     country: [],
@@ -31,9 +35,25 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
   const handleApplyFilters = () => {
     // Convert empty strings to null and filter out empty arrays
     const cleanFilters: Filters = {}
+    const allMarketSegments = ['Online', 'Offline', 'Online TA', 'Online TO', 'Corporate', 'Aviation', 'Complementary']
+    
     Object.keys(localFilters).forEach(key => {
       const typedKey = key as keyof Filters
       const value = localFilters[typedKey]
+      
+      // Special handling for market_segment: if all or none selected, don't filter
+      if (typedKey === 'market_segment' && Array.isArray(value)) {
+        const selectedCount = value.length
+        // If all segments selected or none selected, don't apply filter (show all)
+        if (selectedCount === 0 || selectedCount === allMarketSegments.length) {
+          // Don't add to cleanFilters - means show all
+          return
+        }
+        // Otherwise, apply the filter with selected segments
+        cleanFilters[typedKey] = value as any
+        return
+      }
+      
       if (value !== '' && value !== null && value !== undefined) {
         if (Array.isArray(value) && value.length > 0) {
           cleanFilters[typedKey] = value as any
@@ -52,6 +72,8 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
       booking_status: [],
       arrival_year: '',
       arrival_month: '',
+      arrival_date_from: '',
+      arrival_date_to: '',
       market_segment: [],
       hotel: [],
       country: [],
@@ -62,9 +84,22 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
   const handleCheckboxChange = (field: keyof Filters, value: string) => {
     setLocalFilters(prev => {
       const currentValues = (prev[field] as string[]) || []
+      
+      // Special handling for market_segment "Select All"
+      if (field === 'market_segment' && value === 'All') {
+        const allMarketSegments = ['Online', 'Offline', 'Online TA', 'Online TO', 'Corporate', 'Aviation', 'Complementary']
+        const allSelected = currentValues.length === allMarketSegments.length
+        // If all selected, deselect all. Otherwise, select all
+        return {
+          ...prev,
+          [field]: allSelected ? [] : allMarketSegments
+        }
+      }
+      
       const newValues = currentValues.includes(value)
         ? currentValues.filter(v => v !== value)
         : [...currentValues, value]
+      
       return {
         ...prev,
         [field]: newValues
@@ -80,7 +115,11 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
     <div className="filter-panel">
       <div className="filter-header" onClick={() => setIsExpanded(!isExpanded)}>
         <h3>
-          🔍 Filters 
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}>
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          Filters 
           {activeFilterCount > 0 && (
             <span className="filter-badge">{activeFilterCount} active</span>
           )}
@@ -93,6 +132,7 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
       {isExpanded && (
         <div className="filter-content">
           <div className="filter-grid">
+            {/* Row 1: Price Range | Booking Status */}
             {/* Price Filters */}
             <div className="filter-group">
               <label>Price Range</label>
@@ -123,67 +163,110 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
               <div className="checkbox-group">
                 <label className="checkbox-label">
                   <input
-                    type="checkbox"
-                    checked={localFilters.booking_status?.includes('Not_Canceled') || 
-                             localFilters.booking_status?.includes('false') || false}
+                    type="radio"
+                    name="booking_status"
+                    checked={!localFilters.booking_status || localFilters.booking_status.length === 0}
                     onChange={() => {
-                      handleCheckboxChange('booking_status', 'Not_Canceled')
-                      handleCheckboxChange('booking_status', 'false')
+                      handleInputChange('booking_status', [])
                     }}
                   />
-                  Not Canceled
+                  All
                 </label>
                 <label className="checkbox-label">
                   <input
-                    type="checkbox"
-                    checked={localFilters.booking_status?.includes('Canceled') ||
-                             localFilters.booking_status?.includes('true') || false}
+                    type="radio"
+                    name="booking_status"
+                    checked={localFilters.booking_status?.includes('Canceled') || false}
                     onChange={() => {
-                      handleCheckboxChange('booking_status', 'Canceled')
-                      handleCheckboxChange('booking_status', 'true')
+                      handleInputChange('booking_status', ['Canceled'])
                     }}
                   />
                   Canceled
                 </label>
+                <label className="checkbox-label">
+                  <input
+                    type="radio"
+                    name="booking_status"
+                    checked={localFilters.booking_status?.includes('Not_Canceled') || false}
+                    onChange={() => {
+                      handleInputChange('booking_status', ['Not_Canceled'])
+                    }}
+                  />
+                  Not Canceled
+                </label>
               </div>
             </div>
 
-            {/* Arrival Year */}
+            {/* Row 2: Arrival Date Range | Market Segment */}
+            {/* Arrival Date Range */}
             <div className="filter-group">
-              <label>Arrival Year</label>
-              <select
-                value={localFilters.arrival_year}
-                onChange={(e) => handleInputChange('arrival_year', e.target.value)}
-              >
-                <option value="">All Years</option>
-                <option value="2015">2015</option>
-                <option value="2016">2016</option>
-                <option value="2017">2017</option>
-                <option value="2018">2018</option>
-                <option value="2019">2019</option>
-              </select>
-            </div>
-
-            {/* Arrival Month */}
-            <div className="filter-group">
-              <label>Arrival Month</label>
-              <select
-                value={localFilters.arrival_month}
-                onChange={(e) => handleInputChange('arrival_month', e.target.value)}
-              >
-                <option value="">All Months</option>
-                {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                  <option key={month} value={month.toString()}>
-                    {new Date(2000, month - 1).toLocaleString('default', { month: 'long' })}
-                  </option>
-                ))}
-              </select>
+              <label>Arrival Date</label>
+              <div className="date-range-inputs">
+                <div className="date-picker-group">
+                  <label className="date-label">From</label>
+                  <DatePicker
+                    selected={localFilters.arrival_date_from ? new Date(localFilters.arrival_date_from + '-01') : null}
+                    onChange={(date: Date | null) => {
+                      if (date) {
+                        const year = date.getFullYear()
+                        const month = String(date.getMonth() + 1).padStart(2, '0')
+                        handleInputChange('arrival_date_from', `${year}-${month}`)
+                      } else {
+                        handleInputChange('arrival_date_from', '')
+                      }
+                    }}
+                    dateFormat="MMM yyyy"
+                    showMonthYearPicker
+                    placeholderText="Select month"
+                    minDate={new Date('2015-01-01')}
+                    maxDate={new Date('2019-12-31')}
+                    className="date-picker-input"
+                    wrapperClassName="date-picker-wrapper"
+                    isClearable
+                  />
+                </div>
+                <span className="date-separator">to</span>
+                <div className="date-picker-group">
+                  <label className="date-label">To</label>
+                  <DatePicker
+                    selected={localFilters.arrival_date_to ? new Date(localFilters.arrival_date_to + '-01') : null}
+                    onChange={(date: Date | null) => {
+                      if (date) {
+                        const year = date.getFullYear()
+                        const month = String(date.getMonth() + 1).padStart(2, '0')
+                        handleInputChange('arrival_date_to', `${year}-${month}`)
+                      } else {
+                        handleInputChange('arrival_date_to', '')
+                      }
+                    }}
+                    dateFormat="MMM yyyy"
+                    showMonthYearPicker
+                    placeholderText="Select month"
+                    minDate={localFilters.arrival_date_from ? new Date(localFilters.arrival_date_from + '-01') : new Date('2015-01-01')}
+                    maxDate={new Date('2019-12-31')}
+                    className="date-picker-input"
+                    wrapperClassName="date-picker-wrapper"
+                    isClearable
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Market Segment */}
             <div className="filter-group">
               <label>Market Segment</label>
-              <div className="checkbox-group">
+              <div className="checkbox-group checkbox-group-two-column">
+                <label className="checkbox-label" style={{ gridColumn: '1 / -1', fontWeight: 600, borderBottom: '1px solid #e0e0e0', paddingBottom: '8px', marginBottom: '4px' }}>
+                  <input
+                    type="checkbox"
+                    checked={
+                      (!localFilters.market_segment || localFilters.market_segment.length === 0) ||
+                      localFilters.market_segment.length === 7
+                    }
+                    onChange={() => handleCheckboxChange('market_segment', 'All')}
+                  />
+                  All
+                </label>
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
@@ -242,14 +325,22 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
                 </label>
               </div>
             </div>
+
           </div>
 
           <div className="filter-actions">
             <button className="apply-btn" onClick={handleApplyFilters}>
-              ✓ Apply Filters
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Apply Filters
             </button>
             <button className="clear-btn" onClick={handleClearFilters}>
-              ✕ Clear All
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Clear All
             </button>
           </div>
         </div>

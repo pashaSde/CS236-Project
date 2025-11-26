@@ -4,6 +4,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   overflow: hidden;
+  color: #333;
 }
 
 .filter-header {
@@ -51,6 +52,7 @@
 .filter-content {
   padding: 15px 20px;
   background: #fafbfc;
+  color: #333;
 }
 
 .filter-grid {
@@ -93,6 +95,7 @@
   font-size: 0.9em;
   transition: border-color 0.3s;
   background: white;
+  color: #333;
   width: 100%;
 }
 
@@ -142,6 +145,7 @@
   font-size: 0.9em;
   transition: border-color 0.3s;
   background: white;
+  color: #333;
   cursor: pointer;
 }
 
@@ -149,6 +153,10 @@
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.date-picker-input::placeholder {
+  color: #999;
 }
 
 .date-picker-input:hover {
@@ -267,6 +275,10 @@
 .range-inputs span {
   color: #666;
   font-size: 0.9em;
+}
+
+.range-inputs input::placeholder {
+  color: #999;
 }
 
 .checkbox-group {

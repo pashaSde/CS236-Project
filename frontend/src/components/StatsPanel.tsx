@@ -30,10 +30,12 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
             <div className="stat-value">
               ${statistics.price_statistics?.average?.toFixed(2) || 'N/A'}
             </div>
-            <div className="stat-subtitle">
-              ${statistics.price_statistics?.minimum?.toFixed(2)} - 
-              ${statistics.price_statistics?.maximum?.toFixed(2)}
-            </div>
+            {statistics.price_statistics?.minimum !== null && statistics.price_statistics?.minimum !== undefined &&
+             statistics.price_statistics?.maximum !== null && statistics.price_statistics?.maximum !== undefined && (
+              <div className="stat-subtitle">
+                ${statistics.price_statistics.minimum.toFixed(2)} - ${statistics.price_statistics.maximum.toFixed(2)}
+              </div>
+            )}
           </div>
         </div>
 

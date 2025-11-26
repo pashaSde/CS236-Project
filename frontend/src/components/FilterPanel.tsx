@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import type { Dataset, Filters } from '../types/api'
@@ -31,6 +31,85 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
       [field]: value
     }))
   }
+
+  const handleNumberKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow: backspace, delete, tab, escape, enter, decimal point
+    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z (common shortcuts)
+    // Allow: Arrow keys, Home, End
+    if (
+      ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', '.', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
+      (e.ctrlKey && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) ||
+      (e.metaKey && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase()))
+    ) {
+      return
+    }
+    // Allow numbers 0-9
+    if (e.key >= '0' && e.key <= '9') {
+      return
+    }
+    // Prevent everything else (including letters, special chars)
+    e.preventDefault()
+  }
+
+  const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Filters) => {
+    const value = e.target.value
+    // Only allow numbers and decimal point, remove any other characters
+    const numericValue = value.replace(/[^0-9.]/g, '')
+    // Prevent multiple decimal points
+    const parts = numericValue.split('.')
+    const sanitizedValue = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : numericValue
+    handleInputChange(field, sanitizedValue)
+  }
+
+  const handleDatePickerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow: backspace, delete, tab, escape, enter
+    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z (common shortcuts)
+    // Allow: Arrow keys, Home, End
+    if (
+      ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
+      (e.ctrlKey && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) ||
+      (e.metaKey && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase()))
+    ) {
+      return
+    }
+    // Allow numbers 0-9
+    if (e.key >= '0' && e.key <= '9') {
+      return
+    }
+    // Allow space, dash, slash for date formatting
+    if ([' ', '-', '/'].includes(e.key)) {
+      return
+    }
+    // Prevent everything else (including letters)
+    e.preventDefault()
+  }
+
+  // Custom input component for DatePicker to prevent alphabetic input
+  const DatePickerInput = React.forwardRef<HTMLInputElement, any>(({ value, onClick, onChange, placeholder }, ref) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Only allow numbers, spaces, dashes, and slashes
+      const sanitized = e.target.value.replace(/[^0-9\s\-/]/g, '')
+      if (onChange) {
+        onChange({ target: { value: sanitized } })
+      }
+    }
+
+    return (
+      <input
+        ref={ref}
+        type="text"
+        value={value}
+        onClick={onClick}
+        onChange={handleInputChange}
+        onKeyDown={handleDatePickerKeyDown}
+        placeholder={placeholder}
+        className="date-picker-input"
+        readOnly={false}
+      />
+    )
+  })
+
+  DatePickerInput.displayName = 'DatePickerInput'
 
   const handleApplyFilters = () => {
     // Convert empty strings to null and filter out empty arrays
@@ -138,21 +217,23 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
               <label>Price Range</label>
               <div className="range-inputs">
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   placeholder="Min Price"
                   value={localFilters.min_price}
-                  onChange={(e) => handleInputChange('min_price', e.target.value)}
+                  onChange={(e) => handleNumberInput(e, 'min_price')}
+                  onKeyDown={handleNumberKeyDown}
                   min="0"
-                  step="10"
                 />
                 <span>to</span>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   placeholder="Max Price"
                   value={localFilters.max_price}
-                  onChange={(e) => handleInputChange('max_price', e.target.value)}
+                  onChange={(e) => handleNumberInput(e, 'max_price')}
+                  onKeyDown={handleNumberKeyDown}
                   min="0"
-                  step="10"
                 />
               </div>
             </div>
@@ -220,9 +301,10 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
                     placeholderText="Select month"
                     minDate={new Date('2015-01-01')}
                     maxDate={new Date('2019-12-31')}
-                    className="date-picker-input"
                     wrapperClassName="date-picker-wrapper"
                     isClearable
+                    strictParsing
+                    customInput={<DatePickerInput />}
                   />
                 </div>
                 <span className="date-separator">to</span>
@@ -244,9 +326,10 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
                     placeholderText="Select month"
                     minDate={localFilters.arrival_date_from ? new Date(localFilters.arrival_date_from + '-01') : new Date('2015-01-01')}
                     maxDate={new Date('2019-12-31')}
-                    className="date-picker-input"
                     wrapperClassName="date-picker-wrapper"
                     isClearable
+                    strictParsing
+                    customInput={<DatePickerInput />}
                   />
                 </div>
               </div>

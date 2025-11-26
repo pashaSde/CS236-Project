@@ -209,6 +209,14 @@ async def get_data(
     db: Session = Depends(get_db)
 ):
     validate_dataset(dataset)
+    columns_info = get_table_info(dataset)
+    if not columns_info:
+        raise HTTPException(
+            status_code=500,
+            detail=f"No column metadata found for dataset '{dataset}'"
+        )
+    column_names = [column["name"] for column in columns_info]
+    default_sort_column = "id" if "id" in column_names else column_names[0]
     
     filters = FilterParams(
         min_price=min_price,
@@ -229,10 +237,16 @@ async def get_data(
     count_query = query.replace("SELECT *", "SELECT COUNT(*)")
     total_records = db.execute(text(count_query), params).scalar()
     
+    sort_column = default_sort_column
     if sort_by:
-        query += f" ORDER BY {sort_by} {sort_order.upper()}"
-    else:
-        query += " ORDER BY id"
+        if sort_by not in column_names:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Column '{sort_by}' is not valid for dataset '{dataset}'"
+            )
+        sort_column = sort_by
+    
+    query += f" ORDER BY {sort_column} {sort_order.upper()}"
     
     offset = (page - 1) * page_size
     query += f" LIMIT :limit OFFSET :offset"

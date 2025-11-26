@@ -37,13 +37,18 @@ This report documents the development of Phase 3, which focuses on building an i
 The application follows a three-tier architecture:
 
 ```
-Frontend (React) → Backend (FastAPI) → Database (PostgreSQL)
+Frontend (React) → Backend (FastAPI) → Database (PostgreSQL on AWS RDS)
 ```
+
+**Database Infrastructure:**
+- **Primary:** PostgreSQL database hosted on AWS RDS
+- **Alternative:** Docker PostgreSQL container (available for local development)
+- **Rationale:** AWS RDS provides easier maintenance, automated backups, and seamless collaboration among team members, making it the preferred choice for the project
 
 **Technology Stack:**
 - **Backend:** FastAPI, SQLAlchemy, PostgreSQL
 - **Frontend:** React, TypeScript, AG Grid, Axios
-- **Database:** PostgreSQL (AWS RDS)
+- **Database:** PostgreSQL on AWS RDS (with Docker alternative available)
 
 ### Data Flow
 
@@ -363,11 +368,15 @@ async def get_data(dataset: str, min_price: float = None, ...):
 
 **Location:** `backend/database.py`
 
+**Database Setup:**
+The application uses PostgreSQL hosted on AWS RDS for production and development. While a Docker copy of the database is available for local testing, the RDS instance is preferred for easier maintenance, collaboration, and consistent data access across team members.
+
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Connect to PostgreSQL
+# Connect to PostgreSQL (AWS RDS)
+# Environment variables allow switching between RDS and Docker instances
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(
@@ -389,11 +398,16 @@ def get_db():
 ```
 
 **Connection Flow:**
-1. SQLAlchemy engine connects to PostgreSQL
+1. SQLAlchemy engine connects to PostgreSQL (AWS RDS)
 2. Connection pool manages multiple connections
 3. Each API request gets a database session
 4. Session executes queries and returns results
 5. Session automatically closes after request
+
+**Database Configuration:**
+- **Production:** AWS RDS PostgreSQL instance
+- **Alternative:** Docker PostgreSQL container (for local development)
+- **Benefits of RDS:** Automated backups, easy scaling, team collaboration, managed maintenance
 
 ---
 

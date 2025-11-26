@@ -10,7 +10,7 @@ interface FilterPanelProps {
   onFilterChange: (filters: Filters) => void
 }
 
-const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => {
+const FilterPanel = ({ dataset: _dataset, filters, onFilterChange }: FilterPanelProps) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [localFilters, setLocalFilters] = useState<Filters>({
     min_price: '',

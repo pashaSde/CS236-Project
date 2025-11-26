@@ -79,6 +79,10 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
 
   useEffect(() => {
     setCurrentPage(1)
+  }, [dataset?.name])
+
+  useEffect(() => {
+    setCurrentPage(1)
   }, [filters])
 
   const handlePageChange = (newPage: number) => {

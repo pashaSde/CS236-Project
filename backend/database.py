@@ -46,16 +46,16 @@ def test_connection():
 
 
 def get_available_tables():
-    """Returns list of available table names in the public schema."""
+    """Returns list of available table names in the configured schema."""
     try:
         with engine.connect() as conn:
-            result = conn.execute(text(f"""
+            result = conn.execute(text("""
                 SELECT table_name 
                 FROM information_schema.tables 
-                WHERE table_schema = 'public'
+                WHERE table_schema = :schema
                 AND table_type = 'BASE TABLE'
                 ORDER BY table_name
-            """))
+            """), {"schema": DB_SCHEMA})
             return [row[0] for row in result]
     except Exception as e:
         print(f"Error getting tables: {str(e)}")
@@ -66,13 +66,13 @@ def get_table_info(table_name: str):
     """Returns column metadata (name, type, nullable) for a given table."""
     try:
         with engine.connect() as conn:
-            result = conn.execute(text(f"""
+            result = conn.execute(text("""
                 SELECT column_name, data_type, is_nullable
                 FROM information_schema.columns 
-                WHERE table_schema = 'public'
-                AND table_name = '{table_name}'
+                WHERE table_schema = :schema
+                AND table_name = :table_name
                 ORDER BY ordinal_position
-            """))
+            """), {"schema": DB_SCHEMA, "table_name": table_name})
             return [
                 {
                     "name": row[0],

@@ -433,4 +433,3 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
 }
 
 export default FilterPanel
-

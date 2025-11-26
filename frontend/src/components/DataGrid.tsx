@@ -201,4 +201,3 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
 }
 
 export default DataGrid
-

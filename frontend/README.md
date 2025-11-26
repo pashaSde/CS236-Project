@@ -4,13 +4,13 @@ React frontend with AG Grid for interactive data visualization and filtering.
 
 ## Features
 
-- ✅ Interactive data grid with AG Grid
-- ✅ Dataset selector (3 datasets)
-- ✅ Advanced filtering panel
-- ✅ Real-time statistics dashboard
-- ✅ Pagination and sorting
-- ✅ Responsive design
-- ✅ Modern UI with gradients
+- Interactive data grid with AG Grid
+- Dataset selector (3 datasets)
+- Advanced filtering panel
+- Real-time statistics dashboard
+- Pagination and sorting
+- Responsive design
+- Modern UI with gradients
 
 ## Tech Stack
 

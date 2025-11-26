@@ -4,12 +4,12 @@ FastAPI backend for querying hotel reservation datasets from PostgreSQL.
 
 ## Features
 
-- ✅ REST API for 3 datasets (customer_reservations, hotel_bookings, merged_hotel_data)
-- ✅ Advanced filtering (price, dates, booking status, market segment, etc.)
-- ✅ Pagination and sorting
-- ✅ Statistics endpoints
-- ✅ Auto-generated API documentation (Swagger UI)
-- ✅ CORS enabled for frontend
+- REST API for 3 datasets (customer_reservations, hotel_bookings, merged_hotel_data)
+- Advanced filtering (price, dates, booking status, market segment, etc.)
+- Pagination and sorting
+- Statistics endpoints
+- Auto-generated API documentation (Swagger UI)
+- CORS enabled for frontend
 
 ## Setup
 

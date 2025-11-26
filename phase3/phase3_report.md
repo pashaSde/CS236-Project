@@ -19,7 +19,7 @@
 
 ## Introduction
 
-This report documents the development of Phase 3, which focuses on building an interactive web application for exploring and filtering hotel reservation datasets stored in PostgreSQL. The application provides a user-friendly interface with real-time filtering, pagination, and statistical analysis.
+In this report we discussed the development of the phase 3 of the project, where we built an interactive web application. In this application we provided ability to explore and filter hotel reservation datasets stored in PostgreSQL. The report further discusses the architecture, our methodology for the project.
 
 ### Objectives
 
@@ -41,13 +41,15 @@ Frontend (React) → Backend (FastAPI) → Database (PostgreSQL on AWS RDS)
 ```
 
 **Database Infrastructure:**
+
 - **Primary:** PostgreSQL database hosted on AWS RDS
 - **Alternative:** Docker PostgreSQL container (available for local development)
 - **Rationale:** AWS RDS provides easier maintenance, automated backups, and seamless collaboration among team members, making it the preferred choice for the project
 
 **Technology Stack:**
-- **Backend:** FastAPI, SQLAlchemy, PostgreSQL
-- **Frontend:** React, TypeScript, AG Grid, Axios
+
+- **Backend:** FastAPI, SQLAlchemy
+- **Frontend:** React, TypeScript
 - **Database:** PostgreSQL on AWS RDS (with Docker alternative available)
 
 ### Data Flow
@@ -142,12 +144,16 @@ The statistics panel displays real-time metrics for the selected dataset, includ
 **Location:** `frontend/src/components/FilterPanel.tsx`
 
 **Price Range Filter:**
+
 ```typescript
 // Input validation prevents non-numeric characters
-const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Filters) => {
-  const numericValue = e.target.value.replace(/[^0-9.]/g, '')
-  handleInputChange(field, numericValue)
-}
+const handleNumberInput = (
+  e: React.ChangeEvent<HTMLInputElement>,
+  field: keyof Filters
+) => {
+  const numericValue = e.target.value.replace(/[^0-9.]/g, "");
+  handleInputChange(field, numericValue);
+};
 
 // When user clicks "Apply Filters"
 const handleApplyFilters = () => {
@@ -155,12 +161,13 @@ const handleApplyFilters = () => {
     min_price: localFilters.min_price,
     max_price: localFilters.max_price,
     // ... other filters
-  }
-  onFilterChange(cleanFilters) // Sends to parent component
-}
+  };
+  onFilterChange(cleanFilters); // Sends to parent component
+};
 ```
 
 **Connection to Database:**
+
 - Filter values are sent to backend via API call
 - Backend converts to SQL WHERE clauses
 - PostgreSQL executes: `WHERE avg_price_per_room >= 100 AND avg_price_per_room <= 200`
@@ -168,17 +175,19 @@ const handleApplyFilters = () => {
 ---
 
 **Booking Status Filter:**
+
 ```typescript
 // Radio buttons ensure only one selection
 <input
   type="radio"
   name="booking_status"
-  checked={localFilters.booking_status?.includes('Canceled')}
-  onChange={() => handleInputChange('booking_status', ['Canceled'])}
+  checked={localFilters.booking_status?.includes("Canceled")}
+  onChange={() => handleInputChange("booking_status", ["Canceled"])}
 />
 ```
 
 **Connection to Database:**
+
 - Frontend sends: `booking_status=['Canceled']`
 - Backend converts to boolean: `is_canceled = TRUE`
 - PostgreSQL executes: `WHERE is_canceled = TRUE`
@@ -186,15 +195,20 @@ const handleApplyFilters = () => {
 ---
 
 **Date Range Filter:**
+
 ```typescript
 // DatePicker component for month/year selection
 <DatePicker
-  selected={localFilters.arrival_date_from ? new Date(localFilters.arrival_date_from + '-01') : null}
+  selected={
+    localFilters.arrival_date_from
+      ? new Date(localFilters.arrival_date_from + "-01")
+      : null
+  }
   onChange={(date: Date | null) => {
     if (date) {
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      handleInputChange('arrival_date_from', `${year}-${month}`)
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      handleInputChange("arrival_date_from", `${year}-${month}`);
     }
   }}
   showMonthYearPicker
@@ -202,6 +216,7 @@ const handleApplyFilters = () => {
 ```
 
 **Connection to Database:**
+
 - Frontend sends: `arrival_date_from='2017-01'`
 - Backend parses: `from_year=2017, from_month=1`
 - PostgreSQL executes: `WHERE (arrival_year > 2017 OR (arrival_year = 2017 AND arrival_month >= 1))`
@@ -209,28 +224,30 @@ const handleApplyFilters = () => {
 ---
 
 **Market Segment Filter:**
+
 ```typescript
 // Multi-select with "All" option logic
 const handleCheckboxChange = (field: keyof Filters, value: string) => {
-  if (value === 'All') {
+  if (value === "All") {
     // Toggle all segments
-    const allSelected = currentValues.length === allMarketSegments.length
-    return { [field]: allSelected ? [] : allMarketSegments }
+    const allSelected = currentValues.length === allMarketSegments.length;
+    return { [field]: allSelected ? [] : allMarketSegments };
   }
   // Toggle individual segment
   const newValues = currentValues.includes(value)
-    ? currentValues.filter(v => v !== value)
-    : [...currentValues, value]
-  return { [field]: newValues }
-}
+    ? currentValues.filter((v) => v !== value)
+    : [...currentValues, value];
+  return { [field]: newValues };
+};
 
 // If all or none selected, don't apply filter (show all)
 if (selectedCount === 0 || selectedCount === allMarketSegments.length) {
-  return // Don't add to filters
+  return; // Don't add to filters
 }
 ```
 
 **Connection to Database:**
+
 - Frontend sends: `market_segment=['Online', 'Corporate']`
 - Backend uses PostgreSQL ANY operator
 - PostgreSQL executes: `WHERE market_segment_type = ANY(ARRAY['Online', 'Corporate'])`
@@ -238,23 +255,25 @@ if (selectedCount === 0 || selectedCount === allMarketSegments.length) {
 ---
 
 **Clear Filters:**
+
 ```typescript
 // Reset all filters to empty state
 const handleClearFilters = () => {
   setLocalFilters({
-    min_price: '',
-    max_price: '',
+    min_price: "",
+    max_price: "",
     booking_status: [],
-    arrival_date_from: '',
-    arrival_date_to: '',
+    arrival_date_from: "",
+    arrival_date_to: "",
     market_segment: [],
     // ... other filters reset
-  })
-  onFilterChange({}) // Empty filters object
-}
+  });
+  onFilterChange({}); // Empty filters object
+};
 ```
 
 **Connection to Database:**
+
 - Frontend sends empty filters object: `{}`
 - Backend receives no filter parameters
 - PostgreSQL executes: `SELECT * FROM table` (no WHERE clause)
@@ -267,26 +286,28 @@ const handleClearFilters = () => {
 **Location:** `frontend/src/components/DataGrid.tsx`
 
 **Data Loading:**
+
 ```typescript
 const loadData = async () => {
   const params = {
     page: currentPage,
     page_size: pageSize,
     ...buildFilterParams(filters), // Converts filters to API params
-  }
-  
-  const response = await getData(dataset.name, params)
-  setRowData(response.data)
-  setTotalRecords(response.total_records)
-}
+  };
+
+  const response = await getData(dataset.name, params);
+  setRowData(response.data);
+  setTotalRecords(response.total_records);
+};
 
 // Automatically reloads when filters change
 useEffect(() => {
-  loadData()
-}, [dataset, filters, currentPage, pageSize])
+  loadData();
+}, [dataset, filters, currentPage, pageSize]);
 ```
 
 **Connection to Database:**
+
 - Frontend sends pagination + filter params to API
 - Backend constructs SQL with LIMIT/OFFSET
 - PostgreSQL executes: `SELECT * FROM table WHERE ... LIMIT 100 OFFSET 0`
@@ -298,22 +319,23 @@ useEffect(() => {
 **Location:** `backend/main.py`
 
 **Filter Query Builder:**
+
 ```python
 def build_filter_query(base_query: str, filters: FilterParams) -> tuple:
     """Build SQL WHERE clauses from filter parameters"""
     where_clauses = []
     params = {}
-    
+
     # Price filters
     if filters.min_price is not None:
         where_clauses.append("avg_price_per_room >= :min_price")
         params["min_price"] = filters.min_price
-    
+
     # Booking status
     if filters.booking_status:
         bool_val = True if filters.booking_status[0] == 'Canceled' else False
         where_clauses.append(f"is_canceled = {'TRUE' if bool_val else 'FALSE'}")
-    
+
     # Date range
     if filters.arrival_date_from:
         from_year, from_month = map(int, filters.arrival_date_from.split('-'))
@@ -323,41 +345,43 @@ def build_filter_query(base_query: str, filters: FilterParams) -> tuple:
         )
         params["from_year"] = from_year
         params["from_month"] = from_month
-    
+
     # Market segment
     if filters.market_segment:
         where_clauses.append("market_segment_type = ANY(:market_segment)")
         params["market_segment"] = filters.market_segment
-    
+
     # Combine all filters with AND
     if where_clauses:
         query = f"{base_query} WHERE {' AND '.join(where_clauses)}"
-    
+
     return query, params
 ```
 
 **Data Endpoint:**
+
 ```python
 @app.get("/api/data/{dataset}")
 async def get_data(dataset: str, min_price: float = None, ...):
     # Build SQL query with filters
     base_query = f"SELECT * FROM {DB_SCHEMA}.{dataset}"
     query, params = build_filter_query(base_query, filters)
-    
+
     # Add pagination
     offset = (page - 1) * page_size
     query += f" LIMIT :limit OFFSET :offset"
     params["limit"] = page_size
     params["offset"] = offset
-    
+
     # Execute query
     result = db.execute(text(query), params)
     data = [dict(zip(result.keys(), row)) for row in result]
-    
+
     return DataResponse(data=data, total_records=total_records, ...)
 ```
 
 **Connection to Database:**
+
 - Uses SQLAlchemy to execute parameterized SQL queries
 - Parameters prevent SQL injection attacks
 - Results converted to dictionaries and returned as JSON
@@ -398,6 +422,7 @@ def get_db():
 ```
 
 **Connection Flow:**
+
 1. SQLAlchemy engine connects to PostgreSQL (AWS RDS)
 2. Connection pool manages multiple connections
 3. Each API request gets a database session
@@ -405,6 +430,7 @@ def get_db():
 5. Session automatically closes after request
 
 **Database Configuration:**
+
 - **Production:** AWS RDS PostgreSQL instance
 - **Alternative:** Docker PostgreSQL container (for local development)
 - **Benefits of RDS:** Automated backups, easy scaling, team collaboration, managed maintenance
@@ -426,8 +452,8 @@ def get_db():
    ```
 4. **PostgreSQL:** Executes parameterized query:
    ```sql
-   SELECT * FROM public.merged_hotel_data 
-   WHERE avg_price_per_room >= 100 
+   SELECT * FROM public.merged_hotel_data
+   WHERE avg_price_per_room >= 100
      AND avg_price_per_room <= 200
    ```
 5. **Backend:** Converts results to JSON
@@ -438,12 +464,6 @@ def get_db():
 - **Parameterized Queries:** All user inputs are passed as parameters, preventing SQL injection
 - **Input Validation:** Pydantic models validate all filter parameters
 - **Type Safety:** TypeScript on frontend and Python type hints ensure data integrity
-
-### Performance Optimizations
-
-- **Connection Pooling:** Reuses database connections for efficiency
-- **Pagination:** Limits result sets to manageable sizes
-- **Indexed Columns:** Database indexes on frequently filtered columns (arrival_year, arrival_month, is_canceled)
 
 ---
 
@@ -458,7 +478,3 @@ This Phase 3 implementation successfully creates an interactive web application 
 - **Real-Time Statistics:** Dynamic metrics that update with filters
 
 The application demonstrates seamless integration between React frontend, FastAPI backend, and PostgreSQL database, providing users with powerful tools for data exploration and analysis.
-
----
-
-**End of Report**

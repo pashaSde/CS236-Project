@@ -1,0 +1,28 @@
+!. Start PostGres
+
+docker run -d \
+--name postgres \   
+-e POSTGRES_USER=admin \
+-e POSTGRES_PASSWORD=secret123 \
+-e POSTGRES_DB=InnSight \    
+-p 5432:5432 \
+postgres:latest
+
+run script: spark-submit --packages org.postgresql:postgresql:42.7.3 databaseLoader.py
+
+---
+
+
+Pyspark error fix:
+
+export PYSPARK_SUBMIT_ARGS="--driver-java-options=-Djava.security.manager=allow pyspark-shell"
+
+
+What is done till now:
+
+1. Examine the CSV files to understand their structure and content
+2. Create PySpark EDA script with data loading functionality
+3. Implement schema exploration and basic statistics
+4. Add data quality checks (nulls, duplicates, distinct values)
+5. Implement distribution analysis and visualizations
+6. Generate comprehensive EDA report with insights

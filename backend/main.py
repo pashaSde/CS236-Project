@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 from typing import Optional, List
 
@@ -16,9 +17,19 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Hotel Reservations API", version="1.0.0")
 
+# CORS configuration - allow localhost for dev and Vercel domains for production
+ALLOWED_ORIGINS = [
+    origin.strip() 
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:3000,http://localhost:5173,http://localhost:3001"
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:3001"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

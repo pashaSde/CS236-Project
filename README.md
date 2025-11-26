@@ -2,6 +2,12 @@
 
 CS236 Fall 2025 - Big Data Analysis using PySpark
 
+## Project Team
+
+CS236 Graduate Students - Fall 2025
+-   Pankaj Sharma - 862549035
+-   Saransh Gupta - 862548920
+
 ## Project Overview
 
 This project performs comprehensive exploratory data analysis (EDA) and data integration on hotel booking datasets. It combines customer reservation data with hotel booking data to create a unified dataset for analysis.
@@ -158,12 +164,6 @@ The merged dataset includes 14 columns:
 
 4. **File permission errors**
    - Ensure write permissions in the `output/` directory
-
-## Project Team
-
-CS236 Graduate Students - Fall 2025
--   Pankaj Sharma - 862549035
--   Saransh Gupta - 862548920
 
 ## License
 

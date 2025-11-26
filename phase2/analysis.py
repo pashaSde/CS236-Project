@@ -8,13 +8,19 @@ from pyspark.sql.functions import (
     col, count, avg, sum,
     when, round as _round
 )
+from pyspark.sql.window import Window
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+from generate_report import generate_findings_report
 
 # Month names for plotting
-MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-def load_and_analyze_data(file_path="../output/merged_hotel_data.csv", output_dir="output"):
-
+def load_and_analyze_data(file_path="../output/merged_hotel_data.csv", output_dir="../output/phase-2"):
+    
     # Create output directory structure if it doesn't exist
     plots_dir = os.path.join(output_dir, "plots")
     csvs_dir = os.path.join(output_dir, "csvs")
@@ -29,7 +35,7 @@ def load_and_analyze_data(file_path="../output/merged_hotel_data.csv", output_di
 
     # Load the CSV file
     df = spark.read.csv(file_path, header=True, inferSchema=True)
-
+    
     print("\nPrinting first 5 rows")
     df.show(5)
 
@@ -42,22 +48,22 @@ def load_and_analyze_data(file_path="../output/merged_hotel_data.csv", output_di
         csvs_dir,
         plots_dir
     )
-
+    
     print("\nAverages")
     averages_df = averages(df)
     averages_df.show()
     save_averages_plot(averages_df, csvs_dir, plots_dir)
-
+    
     print("\nMonthly Bookings")
     monthly_bookings_df = monthly_bookings(df)
     monthly_bookings_df.show()
     save_bookings_plot(monthly_bookings_df, csvs_dir, plots_dir)
-
+    
     print("\nSeasonality")
     seasonality_df = seasonality(df)
     seasonality_df.show()
     save_seasonality_plot(seasonality_df, csvs_dir, plots_dir)
-
+    
     return df
 
 def cancellation_rate(df):
@@ -118,7 +124,7 @@ def seasonality(df):
         "total_revenue",
         _round(col("total_revenue"), 2)
     ).orderBy("arrival_month")
-
+    
     return seasonality_df
 
 def save_cancellation_rates_plot(df, csv_dir, plots_dir):
@@ -128,7 +134,7 @@ def save_cancellation_rates_plot(df, csv_dir, plots_dir):
     # Save to CSV
     csv_path = os.path.join(csv_dir, "cancellation_rates.csv")
     pdf.to_csv(csv_path, index=False)
-
+    
     # Create plot
     plt.figure(figsize=(12, 6))
     plt.bar(pdf['arrival_month'], pdf['cancellation_rate_percent'], color='steelblue', edgecolor='black')
@@ -152,7 +158,7 @@ def save_averages_plot(df, csv_dir, plots_dir):
     # Save to CSV
     csv_path = os.path.join(csv_dir, "averages.csv")
     pdf.to_csv(csv_path, index=False)
-
+    
     # Create plot with dual y-axes
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
@@ -176,7 +182,7 @@ def save_averages_plot(df, csv_dir, plots_dir):
     # Set x-axis labels
     ax1.set_xticks(range(1, 13))
     ax1.set_xticklabels(MONTH_NAMES)
-
+    
     plt.title('Average Price and Nights Stayed by Month', fontsize=14, fontweight='bold')
 
     # Save plot
@@ -193,7 +199,7 @@ def save_bookings_plot(df, csv_dir, plots_dir):
     # Save to CSV
     csv_path = os.path.join(csv_dir, "monthly_bookings.csv")
     pdf.to_csv(csv_path, index=False)
-
+    
     # Pivot data for stacked bar chart
     pivot_df = pdf.pivot(index='arrival_month',
                           columns='market_segment_type',
@@ -224,10 +230,10 @@ def save_seasonality_plot(df, csv_dir, plots_dir):
     # Save to CSV
     csv_path = os.path.join(csv_dir, "seasonality.csv")
     pdf.to_csv(csv_path, index=False)
-
+    
     # Create plot
     fig, ax1 = plt.subplots(figsize=(12, 6))
-
+    
     # Left axis: Revenue (Bar chart)
     ax1 = plt.gca()
     ax1.bar(pdf["arrival_month"], pdf["total_revenue"], color="steelblue", alpha=0.7, label="Total Revenue")

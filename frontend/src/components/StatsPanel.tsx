@@ -15,7 +15,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
       <h3>Dataset Statistics</h3>
       
       <div className="stats-grid">
-        {/* Total Records */}
         <div className="stat-card">
           <div className="stat-content">
             <div className="stat-label">Total Records</div>
@@ -23,7 +22,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         </div>
 
-        {/* Average Price */}
         <div className="stat-card">
           <div className="stat-content">
             <div className="stat-label">Average Price</div>
@@ -39,7 +37,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         </div>
 
-        {/* Cancellation Rate */}
         <div className="stat-card">
           <div className="stat-content">
             <div className="stat-label">Cancellation Rate</div>
@@ -53,7 +50,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         </div>
 
-        {/* Average Lead Time */}
         <div className="stat-card">
           <div className="stat-content">
             <div className="stat-label">Avg Lead Time</div>
@@ -63,7 +59,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         </div>
 
-        {/* Unique Hotels */}
         {(statistics.unique_hotels || 0) > 0 && (
           <div className="stat-card">
             <div className="stat-content">
@@ -73,7 +68,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         )}
 
-        {/* Unique Countries */}
         {(statistics.unique_countries || 0) > 0 && (
           <div className="stat-card">
             <div className="stat-content">
@@ -83,7 +77,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         )}
 
-        {/* Average Stay */}
         <div className="stat-card">
           <div className="stat-content">
             <div className="stat-label">Avg Stay</div>
@@ -100,7 +93,6 @@ const StatsPanel = ({ stats }: StatsPanelProps) => {
           </div>
         </div>
 
-        {/* Market Segments */}
         {(statistics.unique_market_segments || 0) > 0 && (
           <div className="stat-card">
             <div className="stat-content">

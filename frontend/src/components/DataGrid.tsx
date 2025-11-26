@@ -20,7 +20,6 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(100)
 
-  // Column definitions based on dataset columns
   const columnDefs = useMemo<ColDef[]>(() => {
     if (!dataset || !dataset.columns) return []
     
@@ -43,7 +42,6 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
     }))
   }, [dataset])
 
-  // Default column properties
   const defaultColDef = useMemo<ColDef>(() => ({
     sortable: true,
     filter: true,
@@ -51,7 +49,6 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
     minWidth: 100,
   }), [])
 
-  // Load data
   const loadData = useCallback(async () => {
     if (!dataset) return
 
@@ -76,12 +73,10 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
     }
   }, [dataset, filters, currentPage, pageSize])
 
-  // Load data when dependencies change
   useEffect(() => {
     loadData()
   }, [loadData])
 
-  // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1)
   }, [filters])

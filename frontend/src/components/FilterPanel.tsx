@@ -33,9 +33,6 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
   }
 
   const handleNumberKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Allow: backspace, delete, tab, escape, enter, decimal point
-    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z (common shortcuts)
-    // Allow: Arrow keys, Home, End
     if (
       ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', '.', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
       (e.ctrlKey && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) ||
@@ -43,28 +40,21 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
     ) {
       return
     }
-    // Allow numbers 0-9
     if (e.key >= '0' && e.key <= '9') {
       return
     }
-    // Prevent everything else (including letters, special chars)
     e.preventDefault()
   }
 
   const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Filters) => {
     const value = e.target.value
-    // Only allow numbers and decimal point, remove any other characters
     const numericValue = value.replace(/[^0-9.]/g, '')
-    // Prevent multiple decimal points
     const parts = numericValue.split('.')
     const sanitizedValue = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : numericValue
     handleInputChange(field, sanitizedValue)
   }
 
   const handleDatePickerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Allow: backspace, delete, tab, escape, enter
-    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z (common shortcuts)
-    // Allow: Arrow keys, Home, End
     if (
       ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
       (e.ctrlKey && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) ||
@@ -72,22 +62,17 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
     ) {
       return
     }
-    // Allow numbers 0-9
     if (e.key >= '0' && e.key <= '9') {
       return
     }
-    // Allow space, dash, slash for date formatting
     if ([' ', '-', '/'].includes(e.key)) {
       return
     }
-    // Prevent everything else (including letters)
     e.preventDefault()
   }
 
-  // Custom input component for DatePicker to prevent alphabetic input
   const DatePickerInput = React.forwardRef<HTMLInputElement, any>(({ value, onClick, onChange, placeholder }, ref) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Only allow numbers, spaces, dashes, and slashes
       const sanitized = e.target.value.replace(/[^0-9\s\-/]/g, '')
       if (onChange) {
         onChange({ target: { value: sanitized } })
@@ -112,7 +97,6 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
   DatePickerInput.displayName = 'DatePickerInput'
 
   const handleApplyFilters = () => {
-    // Convert empty strings to null and filter out empty arrays
     const cleanFilters: Filters = {}
     const allMarketSegments = ['Online', 'Offline', 'Online TA', 'Online TO', 'Corporate', 'Aviation', 'Complementary']
     
@@ -120,19 +104,17 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
       const typedKey = key as keyof Filters
       const value = localFilters[typedKey]
       
-      // Special handling for market_segment: if all or none selected, don't filter
+      // Skip market_segment if all or none selected (no filtering needed)
       if (typedKey === 'market_segment' && Array.isArray(value)) {
         const selectedCount = value.length
-        // If all segments selected or none selected, don't apply filter (show all)
         if (selectedCount === 0 || selectedCount === allMarketSegments.length) {
-          // Don't add to cleanFilters - means show all
           return
         }
-        // Otherwise, apply the filter with selected segments
         cleanFilters[typedKey] = value as any
         return
       }
       
+      // Only include non-empty filter values
       if (value !== '' && value !== null && value !== undefined) {
         if (Array.isArray(value) && value.length > 0) {
           cleanFilters[typedKey] = value as any
@@ -164,17 +146,17 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
     setLocalFilters(prev => {
       const currentValues = (prev[field] as string[]) || []
       
-      // Special handling for market_segment "Select All"
+      // Toggle "All" for market_segment selects/deselects all options
       if (field === 'market_segment' && value === 'All') {
         const allMarketSegments = ['Online', 'Offline', 'Online TA', 'Online TO', 'Corporate', 'Aviation', 'Complementary']
         const allSelected = currentValues.length === allMarketSegments.length
-        // If all selected, deselect all. Otherwise, select all
         return {
           ...prev,
           [field]: allSelected ? [] : allMarketSegments
         }
       }
       
+      // Toggle individual checkbox value
       const newValues = currentValues.includes(value)
         ? currentValues.filter(v => v !== value)
         : [...currentValues, value]
@@ -211,8 +193,6 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
       {isExpanded && (
         <div className="filter-content">
           <div className="filter-grid">
-            {/* Row 1: Price Range | Booking Status */}
-            {/* Price Filters */}
             <div className="filter-group">
               <label>Price Range</label>
               <div className="range-inputs">
@@ -238,7 +218,6 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
               </div>
             </div>
 
-            {/* Booking Status */}
             <div className="filter-group">
               <label>Booking Status</label>
               <div className="checkbox-group">
@@ -278,8 +257,6 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
               </div>
             </div>
 
-            {/* Row 2: Arrival Date Range | Market Segment */}
-            {/* Arrival Date Range */}
             <div className="filter-group">
               <label>Arrival Date</label>
               <div className="date-range-inputs">
@@ -335,7 +312,6 @@ const FilterPanel = ({ dataset, filters, onFilterChange }: FilterPanelProps) => 
               </div>
             </div>
 
-            {/* Market Segment */}
             <div className="filter-group">
               <label>Market Segment</label>
               <div className="checkbox-group checkbox-group-two-column">

@@ -14,12 +14,10 @@ function App() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Load available datasets on mount
   useEffect(() => {
     loadDatasets()
   }, [])
 
-  // Load stats when dataset changes
   useEffect(() => {
     if (selectedDataset) {
       loadStats(selectedDataset.name)

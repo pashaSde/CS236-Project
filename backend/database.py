@@ -1,24 +1,17 @@
-"""
-Database connection and configuration
-"""
-
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import os
 
-# Database configuration
-DB_USER = os.getenv("DB_USER", "***")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "***")
-DB_HOST = os.getenv("DB_HOST", "***")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "rootpassword")
+DB_HOST = os.getenv("DB_HOST", "database-1.cgd0sswa4bi6.us-east-1.rds.amazonaws.com")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_SCHEMA = os.getenv("DB_SCHEMA", "public")
 
-# Database URL
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-# Create SQLAlchemy engine
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
@@ -27,17 +20,12 @@ engine = create_engine(
     connect_args={"options": f"-csearch_path={DB_SCHEMA}"}
 )
 
-# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Base class for models
 Base = declarative_base()
 
 
 def get_db():
-    """
-    Dependency for getting database session
-    """
+    """Database session dependency for FastAPI endpoints."""
     db = SessionLocal()
     try:
         yield db
@@ -46,13 +34,10 @@ def get_db():
 
 
 def test_connection():
-    """
-    Test database connection
-    """
+    """Tests database connectivity by executing a simple query."""
     try:
         with engine.connect() as conn:
-            result = conn.execute(text("SELECT 1"))
-            print("Database connection successful")
+            conn.execute(text("SELECT 1"))
             return True
     except Exception as e:
         print(f"Database connection failed: {str(e)}")
@@ -60,9 +45,7 @@ def test_connection():
 
 
 def get_available_tables():
-    """
-    Get list of available tables in the schema
-    """
+    """Returns list of available table names in the public schema."""
     try:
         with engine.connect() as conn:
             result = conn.execute(text(f"""
@@ -72,30 +55,24 @@ def get_available_tables():
                 AND table_type = 'BASE TABLE'
                 ORDER BY table_name
             """))
-            tables = [row[0] for row in result]
-            return tables
+            return [row[0] for row in result]
     except Exception as e:
         print(f"Error getting tables: {str(e)}")
         return []
 
 
 def get_table_info(table_name: str):
-    """
-    Get column information for a table
-    """
+    """Returns column metadata (name, type, nullable) for a given table."""
     try:
         with engine.connect() as conn:
             result = conn.execute(text(f"""
-                SELECT 
-                    column_name, 
-                    data_type,
-                    is_nullable
+                SELECT column_name, data_type, is_nullable
                 FROM information_schema.columns 
                 WHERE table_schema = 'public'
                 AND table_name = '{table_name}'
                 ORDER BY ordinal_position
             """))
-            columns = [
+            return [
                 {
                     "name": row[0],
                     "type": row[1],
@@ -103,21 +80,16 @@ def get_table_info(table_name: str):
                 }
                 for row in result
             ]
-            return columns
     except Exception as e:
         print(f"Error getting table info: {str(e)}")
         return []
 
 
 if __name__ == "__main__":
-    print("Testing database connection...")
     test_connection()
-    
-    print("\nAvailable tables:")
     tables = get_available_tables()
     for table in tables:
-        print(f"  - {table}")
-        columns = get_table_info(table)
-        for col in columns:
-            print(f"    • {col['name']} ({col['type']})")
+        print(f"{table}")
+        for col in get_table_info(table):
+            print(f"  {col['name']} ({col['type']})")
 

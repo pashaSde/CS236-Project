@@ -1,9 +1,12 @@
 # Load output/merged_hotel_data.csv for analysis using PySpark
 
+import os
+
+import matplotlib.pyplot as plt
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col, count, avg, sum,
-    when, round as _round, desc
+    when, round as _round
 )
 from pyspark.sql.window import Window
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
@@ -22,20 +25,20 @@ def load_and_analyze_data(file_path="../output/merged_hotel_data.csv", output_di
     plots_dir = os.path.join(output_dir, "plots")
     csvs_dir = os.path.join(output_dir, "csvs")
     report_dir = os.path.join(output_dir, "report")
-    
+
     os.makedirs(plots_dir, exist_ok=True)
     os.makedirs(csvs_dir, exist_ok=True)
     os.makedirs(report_dir, exist_ok=True)
-    
+
     # Initialize Spark session
     spark = SparkSession.builder.appName("HotelDataAnalysis").getOrCreate()
-    
+
     # Load the CSV file
     df = spark.read.csv(file_path, header=True, inferSchema=True)
     
     print("\nPrinting first 5 rows")
     df.show(5)
-    
+
     # Perform analyses
     print("\nAnalysis on cancellation rates")
     cancellation_rates_df = cancellation_rate(df)
@@ -70,13 +73,13 @@ def cancellation_rate(df):
         sum(when(col("is_canceled") == "true", 1).otherwise(0)).alias("canceled_count"),
         count("*").alias("total_bookings")
     )
-    
+
     # Calculate cancellation rate as percentage
     cancellation_df = cancellation_df.withColumn(
         "cancellation_rate_percent",
         _round((col("canceled_count") / col("total_bookings")) * 100, 2)
     ).orderBy("arrival_month")
-    
+
     return cancellation_df
 
 def averages(df):
@@ -85,13 +88,13 @@ def averages(df):
         "total_nights",
         col("stays_in_weekend_nights") + col("stays_in_week_nights")
     )
-    
+
     # Group by month and calculate averages
     averages_df = df_with_nights.groupBy("arrival_month").agg(
         _round(avg("avg_price_per_room"), 2).alias("avg_price_per_room"),
         _round(avg("total_nights"), 2).alias("avg_nights_stayed")
     ).orderBy("arrival_month")
-    
+
     return averages_df
 
 def monthly_bookings(df):
@@ -100,7 +103,7 @@ def monthly_bookings(df):
     bookings_df = df.groupBy("arrival_month", "market_segment_type").agg(
         count("*").alias("booking_count")
     ).orderBy("arrival_month", "market_segment_type")
-    
+
     return bookings_df
 
 def seasonality(df):
@@ -112,7 +115,7 @@ def seasonality(df):
         "revenue",
         col("avg_price_per_room") * col("total_nights")
     )
-    
+
     # Group by month and sum revenue
     seasonality_df = df_with_revenue.groupBy("arrival_month").agg(
         sum("revenue").alias("total_revenue"),
@@ -127,7 +130,7 @@ def seasonality(df):
 def save_cancellation_rates_plot(df, csv_dir, plots_dir):
     # Convert to pandas
     pdf = df.toPandas()
-    
+
     # Save to CSV
     csv_path = os.path.join(csv_dir, "cancellation_rates.csv")
     pdf.to_csv(csv_path, index=False)
@@ -140,7 +143,7 @@ def save_cancellation_rates_plot(df, csv_dir, plots_dir):
     plt.title("Cancellation Rates by Month", fontsize=14, fontweight='bold')
     plt.xticks(range(1, 13), MONTH_NAMES)
     plt.grid(axis='y', alpha=0.3)
-    
+
     # Save plot
     plot_path = os.path.join(plots_dir, "cancellation_rates.png")
     plt.tight_layout()
@@ -151,37 +154,37 @@ def save_cancellation_rates_plot(df, csv_dir, plots_dir):
 def save_averages_plot(df, csv_dir, plots_dir):
     # Convert to pandas
     pdf = df.toPandas()
-    
+
     # Save to CSV
     csv_path = os.path.join(csv_dir, "averages.csv")
     pdf.to_csv(csv_path, index=False)
     
     # Create plot with dual y-axes
     fig, ax1 = plt.subplots(figsize=(12, 6))
-    
+
     # Plot average price
     color = 'tab:blue'
     ax1.set_xlabel('Month', fontsize=12, fontweight='bold')
     ax1.set_ylabel('Average Price per Room ($)', color=color, fontsize=12, fontweight='bold')
-    ax1.plot(pdf['arrival_month'], pdf['avg_price_per_room'], 
+    ax1.plot(pdf['arrival_month'], pdf['avg_price_per_room'],
              color=color, marker='o', linewidth=2, markersize=8, label='Avg Price')
     ax1.tick_params(axis='y', labelcolor=color)
     ax1.grid(axis='y', alpha=0.3)
-    
+
     # Create second y-axis for nights
     ax2 = ax1.twinx()
     color = 'tab:orange'
     ax2.set_ylabel('Average Nights Stayed', color=color, fontsize=12, fontweight='bold')
-    ax2.plot(pdf['arrival_month'], pdf['avg_nights_stayed'], 
+    ax2.plot(pdf['arrival_month'], pdf['avg_nights_stayed'],
              color=color, marker='s', linewidth=2, markersize=8, label='Avg Nights')
     ax2.tick_params(axis='y', labelcolor=color)
-    
+
     # Set x-axis labels
     ax1.set_xticks(range(1, 13))
     ax1.set_xticklabels(MONTH_NAMES)
     
     plt.title('Average Price and Nights Stayed by Month', fontsize=14, fontweight='bold')
-    
+
     # Save plot
     plot_path = os.path.join(plots_dir, "averages.png")
     fig.tight_layout()
@@ -192,27 +195,27 @@ def save_averages_plot(df, csv_dir, plots_dir):
 def save_bookings_plot(df, csv_dir, plots_dir):
     # Convert to pandas
     pdf = df.toPandas()
-    
+
     # Save to CSV
     csv_path = os.path.join(csv_dir, "monthly_bookings.csv")
     pdf.to_csv(csv_path, index=False)
     
     # Pivot data for stacked bar chart
-    pivot_df = pdf.pivot(index='arrival_month', 
-                          columns='market_segment_type', 
+    pivot_df = pdf.pivot(index='arrival_month',
+                          columns='market_segment_type',
                           values='booking_count').fillna(0)
-    
+
     # Create stacked bar chart
     fig, ax = plt.subplots(figsize=(14, 7))
     pivot_df.plot(kind='bar', stacked=True, ax=ax, colormap='tab10', edgecolor='black')
-    
+
     ax.set_xlabel('Month', fontsize=12, fontweight='bold')
     ax.set_ylabel('Number of Bookings', fontsize=12, fontweight='bold')
     ax.set_title('Monthly Bookings by Market Segment', fontsize=14, fontweight='bold')
     ax.set_xticklabels(MONTH_NAMES, rotation=0)
     ax.legend(title='Market Segment', bbox_to_anchor=(1.05, 1), loc='upper left')
     ax.grid(axis='y', alpha=0.3)
-    
+
     # Save plot
     plot_path = os.path.join(plots_dir, "monthly_bookings.png")
     plt.tight_layout()
@@ -223,7 +226,7 @@ def save_bookings_plot(df, csv_dir, plots_dir):
 def save_seasonality_plot(df, csv_dir, plots_dir):
     # Convert to pandas
     pdf = df.toPandas().sort_values('arrival_month')
-    
+
     # Save to CSV
     csv_path = os.path.join(csv_dir, "seasonality.csv")
     pdf.to_csv(csv_path, index=False)

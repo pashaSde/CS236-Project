@@ -1,0 +1,107 @@
+arrival_month,market_segment_type,booking_count
+1,Complementary,66
+1,Corporate,298
+1,Direct,369
+1,Groups,205
+1,Offline,314
+1,Offline TA/TO,497
+1,Online,564
+1,Online TA,949
+2,Aviation,2
+2,Complementary,48
+2,Corporate,601
+2,Direct,523
+2,Groups,577
+2,Offline,438
+2,Offline TA/TO,856
+2,Online,1041
+2,Online TA,1509
+3,Aviation,6
+3,Complementary,55
+3,Corporate,451
+3,Direct,491
+3,Groups,671
+3,Offline,538
+3,Offline TA/TO,1061
+3,Online,1627
+3,Online TA,2282
+4,Aviation,50
+4,Complementary,34
+4,Corporate,260
+4,Direct,462
+4,Groups,1093
+4,Offline,661
+4,Offline TA/TO,1171
+4,Online,1973
+4,Online TA,2460
+5,Aviation,58
+5,Complementary,53
+5,Corporate,539
+5,Direct,449
+5,Groups,1206
+5,Offline,651
+5,Offline TA/TO,1150
+5,Online,1676
+5,Online TA,2294
+6,Aviation,12
+6,Complementary,44
+6,Corporate,254
+6,Direct,393
+6,Groups,537
+6,Offline,1371
+6,Offline TA/TO,1964
+6,Online,1706
+6,Online TA,2214
+7,Aviation,5
+7,Complementary,44
+7,Corporate,284
+7,Direct,819
+7,Groups,1242
+7,Offline,638
+7,Offline TA/TO,1481
+7,Online,2149
+7,Online TA,3605
+8,Complementary,94
+8,Corporate,276
+8,Direct,1220
+8,Groups,1381
+8,Offline,740
+8,Offline TA/TO,1490
+8,Online,2904
+8,Online TA,4658
+8,Undefined,2
+9,Aviation,36
+9,Complementary,105
+9,Corporate,626
+9,Direct,878
+9,Groups,2550
+9,Offline,1592
+9,Offline TA/TO,2971
+9,Online,2691
+9,Online TA,3670
+10,Aviation,58
+10,Complementary,114
+10,Corporate,649
+10,Direct,892
+10,Groups,2531
+10,Offline,2068
+10,Offline TA/TO,3149
+10,Online,2954
+10,Online TA,4062
+11,Aviation,25
+11,Complementary,115
+11,Corporate,940
+11,Direct,624
+11,Groups,1143
+11,Offline,801
+11,Offline TA/TO,1323
+11,Online,1888
+11,Online TA,2915
+12,Complementary,148
+12,Corporate,572
+12,Direct,857
+12,Groups,820
+12,Offline,716
+12,Offline TA/TO,1439
+12,Online,2041
+12,Online TA,3208

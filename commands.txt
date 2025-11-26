@@ -4,13 +4,20 @@ docker run -d \
 --name postgres \   
 -e POSTGRES_USER=admin \
 -e POSTGRES_PASSWORD=secret123 \
--e POSTGRES_DB=InnSight \    
+-e POSTGRES_DB=innsight \
 -p 5432:5432 \
 postgres:latest
 
 run script: spark-submit --packages org.postgresql:postgresql:42.7.3 databaseLoader.py
 
+Export sql : docker exec postgres pg_dump -U admin -d innsight --schema-only > phase2_ddl.sql
+
 ---
+
+
+
+
+
 
 
 Pyspark error fix:

@@ -1,0 +1,155 @@
+.app {
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.app-header {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.app-header h1 {
+  color: #667eea;
+  margin-bottom: 10px;
+  font-size: 2.5em;
+}
+
+.app-header p {
+  color: #666;
+  font-size: 1.1em;
+}
+
+.dataset-selector {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.dataset-selector label {
+  color: #333;
+  font-size: 1.1em;
+}
+
+.dataset-selector select {
+  flex: 1;
+  max-width: 600px;
+  padding: 12px;
+  font-size: 1em;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  font-family: inherit;
+}
+
+.dataset-selector select option {
+  color: #333;
+  background: white;
+  padding: 8px;
+}
+
+.dataset-selector select:hover {
+  border-color: #667eea;
+}
+
+.dataset-selector select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.selected-info {
+  color: #667eea;
+  font-size: 0.95em;
+  padding: 8px 16px;
+  background: #f0f4ff;
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+}
+
+.selected-info strong {
+  color: #5568d3;
+}
+
+.loading, .error {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin: 40px auto;
+  max-width: 600px;
+}
+
+.error {
+  border-left: 4px solid #f44336;
+}
+
+.error h2 {
+  color: #f44336;
+  margin-bottom: 15px;
+}
+
+.error p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.error button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.error button:hover {
+  background: #5568d3;
+}
+
+.app-footer {
+  margin-top: 40px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app {
+    padding: 10px;
+  }
+
+  .app-header h1 {
+    font-size: 1.8em;
+  }
+
+  .dataset-selector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dataset-selector select {
+    max-width: 100%;
+  }
+}
+

@@ -178,7 +178,6 @@ const DataGrid = ({ dataset, filters }: DataGridProps) => {
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          loading={loading}
           animateRows={true}
           pagination={false}
           enableCellTextSelection={true}
